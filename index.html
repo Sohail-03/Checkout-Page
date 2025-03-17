@@ -205,8 +205,13 @@
                     ${product2 > 0 ? `<li>Phone x ${product2} = $${product2 * products.phone}</li>` : ''}
                 </ul>
                 <p><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
-                <p><strong>
-                    `
+                <p><strong>Tax:</strong> $${tax.toFixed(2)}</p>
+                <p><strong>Total:</strong> $${total.toFixed(2)}</p>
+`;
+
+document.getElementById('receipt').innerHTML = receipt;
+document.getElementById('receipt').style.display = 'block';
+
     </script>
 </body>
 </html>
