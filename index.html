@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select, button {
+            margin-top: 5px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .receipt {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Checkout Page</h2>
+        <form id="checkout-form">
+            <!-- Customer Information -->
+            <label for="name">Full Name</label>
+            <input type="text" id="name" required>
+            <span class="error" id="name-error"></span>
+
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" required>
+            <span class="error" id="phone-error"></span>
+
+            <label for="address">Address</label>
+            <input type="text" id="address" required>
+            <span class="error" id="address-error"></span>
+
+            <label for="city">City</label>
+            <input type="text" id="city" required>
+            <span class="error" id="city-error"></span>
+
+            <label for="province">Province</label>
+            <select id="province" required>
+                <option value="">Select Province</option>
+                <option value="ON">Ontario (13%)</option>
+                <option value="QC">Quebec (14.975%)</option>
+                <option value="BC">British Columbia (12%)</option>
+            </select>
+            <span class="error" id="province-error"></span>
+
+            <label for="postalcode">Postcode</label>
+            <input type="text" id="postalcode" required>
+            <span class="error" id="postalcode-error"></span>
+
+            <!-- Payment Information -->
+            <label for="cc-number">Credit Card Number</label>
+            <input type="text" id="cc-number" placeholder="xxxx-xxxx-xxxx-xxxx" required>
+            <span class="error" id="cc-number-error"></span>
+
+            <label for="cc-expiry-month">Expiry Month</label>
+            <input type="text" id="cc-expiry-month" placeholder="e.g., NOV" required>
+            <span class="error" id="cc-expiry-month-error"></span>
+
+            <label for="cc-expiry-year">Expiry Year</label>
+            <input type="text" id="cc-expiry-year" placeholder="e.g., 2024" required>
+            <span class="error" id="cc-expiry-year-error"></span>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" required>
+            <span class="error" id="email-error"></span>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" required>
+            <span class="error" id="password-error"></span>
+
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" required>
+            <span class="error" id="confirm-password-error"></span>
+
+            <!-- Product Selection -->
+            <label for="product1">Product 1 (Laptop - $500)</label>
+            <input type="number" id="product1" min="0" value="0">
+
+            <label for="product2">Product 2 (Phone - $300)</label>
+            <input type="number" id="product2" min="0" value="0">
+
+            <button type="button" id="submit-btn">Submit</button>
+        </form>
+
+        <div class="receipt" id="receipt" style="display: none;"></div>
+    </div>
+
+    <script>
+        const products = {
+            laptop: 500,
+            phone: 300,
+        };
+
+        const taxRates = {
+            ON: 0.13,
+            QC: 0.14975,
+            BC: 0.12,
+        };
+
+        document.getElementById('submit-btn').addEventListener('click', () => {
+            const errors = {};
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const province = document.getElementById('province').value;
+            const postalcode = document.getElementById('postalcode').value.trim();
+            const ccNumber = document.getElementById('cc-number').value.trim();
+            const ccExpiryMonth = document.getElementById('cc-expiry-month').value.trim().toUpperCase();
+            const ccExpiryYear = document.getElementById('cc-expiry-year').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const product1 = parseInt(document.getElementById('product1').value, 10);
+            const product2 = parseInt(document.getElementById('product2').value, 10);
+
+            // Validate required fields
+            if (!name) errors['name'] = "Full Name is required.";
+            if (!phone) errors['phone'] = "Phone is required.";
+            if (!address) errors['address'] = "Address is required.";
+            if (!city) errors['city'] = "City is required.";
+            if (!province) errors['province'] = "Province is required.";
+            if (!postalcode) errors['postalcode'] = "Postal Code is required.";
+            if (!ccNumber.match(/^\d{4}-\d{4}-\d{4}-\d{4}$/)) errors['cc-number'] = "Invalid Credit Card Number format.";
+            if (!ccExpiryMonth.match(/^(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)$/)) errors['cc-expiry-month'] = "Invalid Expiry Month format.";
+            if (!ccExpiryYear.match(/^\d{4}$/)) errors['cc-expiry-year'] = "Invalid Expiry Year format.";
+            if (!email.match(/^\S+@\S+\.\S+$/)) errors['email'] = "Invalid Email format.";
+            if (password !== confirmPassword) errors['confirm-password'] = "Passwords do not match.";
+
+            // Clear previous errors
+            document.querySelectorAll('.error').forEach(el => el.textContent = '');
+
+            if (Object.keys(errors).length > 0) {
+                Object.keys(errors).forEach(key => {
+                    document.getElementById(`${key}-error`).textContent = errors[key];
+                });
+                return;
+            }
+
+            // Calculate totals
+            const subtotal = (product1 * products.laptop) + (product2 * products.phone);
+            if (subtotal < 10) {
+                alert("Minimum purchase total of $10 is required.");
+                return;
+            }
+
+            const tax = subtotal * taxRates[province];
+            const total = subtotal + tax;
+
+            // Generate receipt
+            const receipt = `
+                <h3>Receipt</h3>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Phone:</strong> ${phone}</p>
+                <p><strong>Address:</strong> ${address}, ${city}, ${province}, ${postalcode}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Products:</strong></p>
+                <ul>
+                    ${product1 > 0 ? `<li>Laptop x ${product1} = $${product1 * products.laptop}</li>` : ''}
+                    ${product2 > 0 ? `<li>Phone x ${product2} = $${product2 * products.phone}</li>` : ''}
+                </ul>
+                <p><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
+                <p><strong>
+                    `
+    </script>
+</body>
+</html>
